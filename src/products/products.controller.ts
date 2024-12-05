@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
 import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
 import { UserPermissions } from 'src/permissions/enum/User-Permissions.enum';
 import { SetPermissions } from 'src/auth/Decorators/metaData';
@@ -23,8 +25,19 @@ export class ProductsController {
 
   @Post()
   @SetPermissions(UserPermissions.PRODUCTS)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  @ApiProperty({ type: CreateProductDto })
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @Query('categoryIds') categoryIds: string,
+  ) {
+    if (!categoryIds) {
+      throw new BadRequestException('categoryIds are required');
+    }
+    const categoryIdsArray = categoryIds
+      .split(',')
+      .map((id) => Number(id))
+      .filter((id) => !isNaN(id));
+    return this.productsService.create(createProductDto, categoryIdsArray);
   }
 
   @Get()

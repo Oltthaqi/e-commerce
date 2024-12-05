@@ -24,7 +24,7 @@ export class Product {
   @Column()
   stock: number;
 
-  @Column()
+  @Column({ default: ProductStatus.ACTIVE })
   status: ProductStatus;
 
   @Column()

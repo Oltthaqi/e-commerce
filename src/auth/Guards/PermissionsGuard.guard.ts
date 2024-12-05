@@ -31,9 +31,26 @@ export class PermissionsGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+      ) as jwt.JwtPayload & {
+        username?: string;
+        roles?: string[];
+        permissions?: string[];
+        sub?: string | number;
+      };
 
-      request.user = decoded;
+      if (!decoded || typeof decoded !== 'object') {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
+      request.user = {
+        userId: decoded.sub,
+        username: decoded.username,
+        roles: decoded.roles,
+        permissions: decoded.permissions,
+      };
 
       const userPermissions = request.user.permissions || [];
       const hasPermission = requiredPermissions.every((permission) =>
@@ -42,8 +59,8 @@ export class PermissionsGuard implements CanActivate {
 
       return hasPermission;
     } catch (err) {
-      console.error('JWT verification failed:', err.message);
-      throw new UnauthorizedException('Invalid token');
+      console.error(err.message);
+      throw new UnauthorizedException('you cant access this route');
     }
   }
 }

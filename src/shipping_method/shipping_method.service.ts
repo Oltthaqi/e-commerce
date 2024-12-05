@@ -1,26 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateShippingMethodDto } from './dto/create-shipping_method.dto';
 import { UpdateShippingMethodDto } from './dto/update-shipping_method.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ShippingMethod } from './entities/shipping_method.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ShippingMethodService {
-  create(createShippingMethodDto: CreateShippingMethodDto) {
-    return 'This action adds a new shippingMethod';
+  constructor(
+    @InjectRepository(ShippingMethod)
+    private shippingMethodRepo: Repository<ShippingMethod>,
+  ) {}
+  async create(createShippingMethodDto: CreateShippingMethodDto) {
+    const shippingMethod = await this.shippingMethodRepo.findOne({
+      where: { name: createShippingMethodDto.name },
+    });
+
+    if (shippingMethod) {
+      throw new BadRequestException('Shipping method already exists');
+    }
+    const shippingMethodToAdd = await this.shippingMethodRepo.create(
+      createShippingMethodDto,
+    );
+    return await this.shippingMethodRepo.save(shippingMethodToAdd);
   }
 
-  findAll() {
-    return `This action returns all shippingMethod`;
+  async findAll() {
+    return await this.shippingMethodRepo.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} shippingMethod`;
+    return this.shippingMethodRepo.findOne({ where: { id } });
   }
 
-  update(id: number, updateShippingMethodDto: UpdateShippingMethodDto) {
-    return `This action updates a #${id} shippingMethod`;
+  async update(id: number, updateShippingMethodDto: UpdateShippingMethodDto) {
+    const shippingMethod = await this.shippingMethodRepo.findOne({
+      where: { id },
+    });
+
+    if (!shippingMethod) {
+      throw new NotFoundException('Shipping method not found');
+    }
+    Object.assign(shippingMethod, updateShippingMethodDto);
+    return this.shippingMethodRepo.save(shippingMethod);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} shippingMethod`;
+  async remove(id: number) {
+    const shippingMethod = await this.shippingMethodRepo.findOne({
+      where: { id },
+    });
+    if (!shippingMethod) {
+      throw new NotFoundException('Shipping method not found');
+    }
+    return this.shippingMethodRepo.remove(shippingMethod);
   }
 }

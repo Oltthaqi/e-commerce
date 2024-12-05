@@ -17,12 +17,14 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
+  userId: number;
   @ManyToOne(() => User, (user) => user.orders, {
     onDelete: 'CASCADE',
     eager: true,
   })
   user: User;
 
+  shippingMethodId: number;
   @ManyToOne(
     () => ShippingMethod,
     (shipping_method) => shipping_method.orders,

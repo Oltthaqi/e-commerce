@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateOrderDto } from './create-order.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { OrderStatus } from '../enum/Order.status.enum';
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
+export class UpdateOrderDto {
+  updatedAt: Date;
+
+  @ApiProperty()
+  status: OrderStatus;
+}

@@ -7,25 +7,31 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
 import { SetPermissions } from 'src/auth/Decorators/metaData';
 import { UserPermissions } from 'src/permissions/enum/User-Permissions.enum';
+import { Request } from 'express';
 
 @ApiBearerAuth('access-token')
 @Controller('orders')
-@UseGuards(PermissionsGuard)
+// @UseGuards(PermissionsGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post()
+  @Post(':shippingMethodId')
   @SetPermissions(UserPermissions.ORDERS)
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  @UseGuards(PermissionsGuard)
+  create(
+    @Req() req: Request,
+    @Param('shippingMethodId') shippingMethodId: number,
+  ) {
+    const user = req.user;
+    return this.ordersService.create(user.userId, shippingMethodId);
   }
 
   @Get()
