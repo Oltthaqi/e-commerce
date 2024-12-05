@@ -6,36 +6,47 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
+import { SetPermissions } from 'src/auth/Decorators/metaData';
+import { UserPermissions } from 'src/permissions/enum/User-Permissions.enum';
+@ApiBearerAuth('access-token')
 @Controller('user')
+@UseGuards(PermissionsGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @SetPermissions(UserPermissions.USERS)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Get()
+  @SetPermissions(UserPermissions.USERS)
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
+  @SetPermissions(UserPermissions.USERS)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
 
   @Patch(':id')
+  @SetPermissions(UserPermissions.USERS)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @SetPermissions(UserPermissions.USERS)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }

@@ -1,33 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ShippingMethodService } from './shipping_method.service';
 import { CreateShippingMethodDto } from './dto/create-shipping_method.dto';
 import { UpdateShippingMethodDto } from './dto/update-shipping_method.dto';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
+import { UserPermissions } from 'src/permissions/enum/User-Permissions.enum';
+import { SetPermissions } from 'src/auth/Decorators/metaData';
+@ApiBearerAuth('access-token')
 @Controller('shipping-method')
+@UseGuards(PermissionsGuard)
 export class ShippingMethodController {
   constructor(private readonly shippingMethodService: ShippingMethodService) {}
 
   @Post()
+  @SetPermissions(UserPermissions.SHIPPING)
   create(@Body() createShippingMethodDto: CreateShippingMethodDto) {
     return this.shippingMethodService.create(createShippingMethodDto);
   }
 
   @Get()
+  @SetPermissions(UserPermissions.SHIPPING)
   findAll() {
     return this.shippingMethodService.findAll();
   }
 
   @Get(':id')
+  @SetPermissions(UserPermissions.SHIPPING)
   findOne(@Param('id') id: string) {
     return this.shippingMethodService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShippingMethodDto: UpdateShippingMethodDto) {
+  @SetPermissions(UserPermissions.SHIPPING)
+  update(
+    @Param('id') id: string,
+    @Body() updateShippingMethodDto: UpdateShippingMethodDto,
+  ) {
     return this.shippingMethodService.update(+id, updateShippingMethodDto);
   }
 
   @Delete(':id')
+  @SetPermissions(UserPermissions.SHIPPING)
   remove(@Param('id') id: string) {
     return this.shippingMethodService.remove(+id);
   }

@@ -23,10 +23,12 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
+  @SetPermissions(UserPermissions.ROLES)
   create(@Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto);
   }
   @Post('assign/permissions/:id')
+  @SetPermissions(UserPermissions.ROLES)
   @ApiBody({
     schema: {
       type: 'object',
@@ -46,6 +48,7 @@ export class RolesController {
   }
 
   @Post('remove/permission/:id')
+  @SetPermissions(UserPermissions.ROLES)
   @ApiBody({
     schema: {
       type: 'object',
@@ -63,8 +66,9 @@ export class RolesController {
   ) {
     return this.rolesService.removePermission(+id, permissionId);
   }
-  @SetPermissions(UserPermissions.GET_USERS)
+
   @Post('assign/Role/:userId/:roleId')
+  @SetPermissions(UserPermissions.ROLES)
   assignRoleToUser(
     @Param('userId') userId: number,
     @Param('roleId') roleId: number,
@@ -73,21 +77,25 @@ export class RolesController {
   }
 
   @Get()
+  @SetPermissions(UserPermissions.ROLES)
   findAll() {
     return this.rolesService.findAll();
   }
 
   @Get(':id')
+  @SetPermissions(UserPermissions.ROLES)
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(+id);
   }
 
   @Patch(':id')
+  @SetPermissions(UserPermissions.ROLES)
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(+id, updateRoleDto);
   }
 
   @Delete(':id')
+  @SetPermissions(UserPermissions.ROLES)
   remove(@Param('id') id: string) {
     return this.rolesService.remove(+id);
   }

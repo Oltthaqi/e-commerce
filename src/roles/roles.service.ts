@@ -6,7 +6,6 @@ import { Role } from './entities/role.entity';
 import { Repository } from 'typeorm';
 import { Permission } from 'src/permissions/entities/permission.entity';
 import { User } from 'src/user/entities/user.entity';
-import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
 
 @Injectable()
 export class RolesService {
@@ -100,10 +99,15 @@ export class RolesService {
   }
 
   update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+    const role = this.roleRepository.findOne({ where: { id } });
+    if (!role) {
+      throw new BadRequestException('Role not found');
+    }
+    return this.roleRepository.update(id, updateRoleDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: number) {
+    const role = await this.roleRepository.findOne({ where: { id } });
+    return this.roleRepository.remove(role);
   }
 }

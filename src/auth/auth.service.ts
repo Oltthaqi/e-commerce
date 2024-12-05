@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { RegisterUsersDto } from './dto/register-User.dto';
 import { Role } from 'src/roles/entities/role.entity';
+import { UserRole } from 'src/user/enum/User-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -71,7 +72,9 @@ export class AuthService {
       registerUserDto.password,
       saltRounds,
     );
-    const roles = await this.roleRepository.find({ where: { id: 1 } });
+    const roles = await this.roleRepository.find({
+      where: { name: UserRole.USER },
+    });
     const newUser = this.userRepository.create({
       ...registerUserDto,
       password: hashedPassword,
