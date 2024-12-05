@@ -8,6 +8,36 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class UserService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+
+  async getUserRoles(userId: number): Promise<any[]> {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .innerJoin('user_roles', 'ur', 'ur.user_Id = user.id')
+      .innerJoin('role', 'role', 'role.id = ur.role_Id')
+      .where('user.id = :userId', { userId })
+      .select(['role.id', 'role.name'])
+      .getRawMany();
+  }
+
+  async getUserPermissions(userId: number): Promise<any[]> {
+    const rawPermissions = await this.userRepo
+      .createQueryBuilder('user')
+      .innerJoin('user_roles', 'ur', 'ur.user_Id = user.id')
+      .innerJoin('role', 'role', 'role.id = ur.role_Id')
+      .innerJoin('role_permissions', 'rp', 'rp.role_Id = role.id')
+      .innerJoin('permission', 'permission', 'permission.id = rp.permission_Id')
+      .where('user.id = :userId', { userId })
+      .select([
+        'permission.id AS permissionId',
+        'permission.name AS permissionName',
+      ])
+      .getRawMany();
+
+    return rawPermissions.map((permission) => ({
+      id: permission.permissionId,
+      name: permission.permissionName,
+    }));
+  }
   create(createUserDto: CreateUserDto) {
     const user = this.userRepo.findOne({
       where: { email: createUserDto.email },
@@ -20,7 +50,7 @@ export class UserService {
   }
 
   findAll() {
-    return this.userRepo.find();
+    return this.userRepo.find({ relations: ['roles', 'roles.permissions'] });
   }
 
   findOne(id: number) {

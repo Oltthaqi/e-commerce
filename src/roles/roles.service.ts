@@ -1,13 +1,96 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from './entities/role.entity';
+import { Repository } from 'typeorm';
+import { Permission } from 'src/permissions/entities/permission.entity';
+import { User } from 'src/user/entities/user.entity';
+import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
+    @InjectRepository(Permission)
+    private permissionRepository: Repository<Permission>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+  async create(createRoleDto: CreateRoleDto) {
+    const role = await this.roleRepository.findOne({
+      where: { name: createRoleDto.name },
+    });
+    if (role) {
+      throw new BadRequestException('Role already exists');
+    }
+    const roleToAdd = this.roleRepository.create(createRoleDto);
+    return this.roleRepository.save(roleToAdd);
   }
 
+  async givePermissionToRole(roleId: number, permissionId: number[]) {
+    const role = await this.roleRepository.findOne({
+      where: { id: roleId },
+      relations: ['permissions'],
+    });
+
+    if (!role) {
+      throw new BadRequestException('Role not found');
+    }
+    const permissions = await this.permissionRepository.findByIds(permissionId);
+
+    if (!permissions) {
+      throw new BadRequestException('Permission not found');
+    }
+    role.permissions = [
+      ...role.permissions,
+      ...permissions.filter(
+        (permission) =>
+          !role.permissions.some(
+            (existingPermission) => existingPermission.id === permission.id,
+          ),
+      ),
+    ];
+    return this.roleRepository.save(role);
+  }
+
+  async removePermission(roleId: number, permissionId: number[]) {
+    const role = await this.roleRepository.findOne({
+      where: { id: roleId },
+      relations: ['permissions'],
+    });
+
+    if (!role) {
+      throw new BadRequestException('Role not found');
+    }
+    if (role.name === 'admin') {
+      throw new BadRequestException(
+        'Permission cannot be removed from admin role',
+      );
+    }
+
+    role.permissions = role.permissions.filter(
+      (existingPermission) => !permissionId.includes(existingPermission.id),
+    );
+    return this.roleRepository.save(role);
+  }
+
+  async roleAsign(userId: number, roleId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const role = await this.roleRepository.findOne({
+      where: { id: roleId },
+      relations: ['permissions'],
+    });
+    if (!role) {
+      throw new BadRequestException('Role not found');
+    }
+
+    user.roles = [role];
+    return this.userRepository.save(user);
+  }
   findAll() {
     return `This action returns all roles`;
   }

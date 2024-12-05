@@ -19,7 +19,11 @@ import { AddressesModule } from './addresses/addresses.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    TypeOrmModule.forRootAsync(dataSourceOptions),
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => ({
+        ...dataSourceOptions,
+      }),
+    }),
     UserModule,
     AuthModule,
     OrdersModule,
