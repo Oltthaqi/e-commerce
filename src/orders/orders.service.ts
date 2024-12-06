@@ -3,6 +3,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
+import { OrderStatus } from './enum/Order.status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -15,18 +16,22 @@ export class OrdersService {
       shippingMethodId,
       created_At: new Date(),
       updated_At: new Date(),
+      status: OrderStatus.PENDING,
+      total: 0,
     });
-    await this.orderRepo.save(order);
-    const orderUpdate = await this.orderRepo.findOne({
-      where: { id: order.id },
-      relations: ['order_Line'],
-    });
+    return await this.orderRepo.save(order);
+  }
 
-    orderUpdate.total = orderUpdate.orderLines.reduce((acc, orderLine) => {
+  async updateTotal(orderId: number) {
+    const order = await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: ['orderLines'],
+    });
+    order.total = order.orderLines.reduce((acc, orderLine) => {
       return acc + orderLine.total;
     }, 0);
 
-    return this.orderRepo.save(orderUpdate);
+    return this.orderRepo.save(order);
   }
 
   findAll() {

@@ -2,19 +2,17 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { OrderLinesService } from './order-lines.service';
-import { CreateOrderLineDto } from './dto/create-order-line.dto';
-import { UpdateOrderLineDto } from './dto/update-order-line.dto';
 import { PermissionsGuard } from 'src/auth/Guards/PermissionsGuard.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UserPermissions } from 'src/permissions/enum/User-Permissions.enum';
 import { SetPermissions } from 'src/auth/Decorators/metaData';
+import { Request } from 'express';
 
 @ApiBearerAuth('access-token')
 @Controller('order-lines')
@@ -22,10 +20,13 @@ import { SetPermissions } from 'src/auth/Decorators/metaData';
 export class OrderLinesController {
   constructor(private readonly orderLinesService: OrderLinesService) {}
 
-  @Post()
-  @SetPermissions(UserPermissions.ORDERS)
-  create(@Body() createOrderLineDto: CreateOrderLineDto) {
-    return this.orderLinesService.create(createOrderLineDto);
+  @Post(':orderId/:productId')
+  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
+  create(
+    @Param('orderId') orderId: number,
+    @Param('productId') productId: number,
+  ) {
+    return this.orderLinesService.create(orderId, productId);
   }
 
   @Get()
@@ -39,14 +40,11 @@ export class OrderLinesController {
   findOne(@Param('id') id: string) {
     return this.orderLinesService.findOne(+id);
   }
-
-  @Patch(':id')
-  @SetPermissions(UserPermissions.ORDERS)
-  update(
-    @Param('id') id: string,
-    @Body() updateOrderLineDto: UpdateOrderLineDto,
-  ) {
-    return this.orderLinesService.update(+id, updateOrderLineDto);
+  @Get('order/:orderId')
+  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
+  findByOrderId(@Param('orderId') orderId: string, @Req() req: Request) {
+    const user = req.user;
+    return this.orderLinesService.findByOrderId(+orderId, +user.userId);
   }
 
   @Delete(':id')

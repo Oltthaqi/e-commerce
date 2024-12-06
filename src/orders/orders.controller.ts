@@ -19,13 +19,12 @@ import { Request } from 'express';
 
 @ApiBearerAuth('access-token')
 @Controller('orders')
-// @UseGuards(PermissionsGuard)
+@UseGuards(PermissionsGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post(':shippingMethodId')
   @SetPermissions(UserPermissions.ORDERS)
-  @UseGuards(PermissionsGuard)
   create(
     @Req() req: Request,
     @Param('shippingMethodId') shippingMethodId: number,
