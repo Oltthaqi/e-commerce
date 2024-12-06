@@ -9,9 +9,9 @@ import { OrderStatus } from './enum/Order.status.enum';
 export class OrdersService {
   constructor(@InjectRepository(Order) private orderRepo: Repository<Order>) {}
   async create(userId: number, shippingMethodId: number) {
-    console.log(userId, shippingMethodId);
-
     const order = await this.orderRepo.create({
+      user: { id: userId },
+      shipping_method: { id: shippingMethodId },
       userId,
       shippingMethodId,
       created_At: new Date(),
@@ -28,7 +28,7 @@ export class OrdersService {
       relations: ['orderLines'],
     });
     order.total = order.orderLines.reduce((acc, orderLine) => {
-      return acc + orderLine.total;
+      return acc + orderLine.total * orderLine.quantity;
     }, 0);
 
     return this.orderRepo.save(order);

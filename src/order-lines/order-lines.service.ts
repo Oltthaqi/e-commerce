@@ -26,20 +26,28 @@ export class OrderLinesService {
     });
 
     if (!orderLineExists) {
-      const orderLine = this.orderLineRepository.create({
+      const orderLine = await this.orderLineRepository.create({
         order: { id: orderId },
         product: { id: productId },
         quantity: 1,
         price: product.price,
         total: product.price,
       });
-      this.ordersService.updateTotal(orderId);
-      return this.orderLineRepository.save(orderLine);
+
+      const ordLine = await this.orderLineRepository.save(orderLine);
+
+      await this.ordersService.updateTotal(orderId);
+
+      return ordLine;
     }
     orderLineExists.total += product.price;
     orderLineExists.quantity += 1;
+
+    const ordLine = await this.orderLineRepository.save(orderLineExists);
+
     this.ordersService.updateTotal(orderId);
-    return this.orderLineRepository.save(orderLineExists);
+
+    return ordLine;
   }
 
   findAll() {
@@ -67,15 +75,25 @@ export class OrderLinesService {
   }
 
   async remove(id: number) {
-    const orderLine = await this.orderLineRepository.findOne({ where: { id } });
+    const orderLine = await this.orderLineRepository.findOne({
+      where: { id },
+      relations: ['order'],
+    });
     if (!orderLine) {
       throw new NotFoundException('OrderLine not found');
     }
-    this.ordersService.updateTotal(orderLine.order.id);
+
     if (orderLine.quantity > 1) {
       orderLine.quantity -= 1;
-      return this.orderLineRepository.save(orderLine);
+
+      const saveorder = await this.orderLineRepository.save(orderLine);
+      await this.ordersService.updateTotal(saveorder.order.id);
+      return saveorder;
     }
-    return this.orderLineRepository.remove(orderLine);
+    const remove = await this.orderLineRepository.remove(orderLine);
+
+    await this.ordersService.updateTotal(remove.order.id);
+
+    return remove;
   }
 }

@@ -48,8 +48,10 @@ export class OrderLinesController {
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
   remove(@Param('id') id: string) {
+    console.log(id);
+
     return this.orderLinesService.remove(+id);
   }
 }
