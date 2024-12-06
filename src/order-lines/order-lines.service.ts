@@ -87,6 +87,8 @@ export class OrderLinesService {
       orderLine.quantity -= 1;
 
       const saveorder = await this.orderLineRepository.save(orderLine);
+      console.log(saveorder);
+
       await this.ordersService.updateTotal(saveorder.order.id);
       return saveorder;
     }
