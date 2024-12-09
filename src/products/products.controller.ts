@@ -24,7 +24,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @SetPermissions(UserPermissions.PRODUCTS)
+  @SetPermissions(UserPermissions.PRODUCTS_CREATE)
   @ApiProperty({ type: CreateProductDto })
   create(
     @Body() createProductDto: CreateProductDto,
@@ -41,25 +41,25 @@ export class ProductsController {
   }
 
   @Get()
-  @SetPermissions(UserPermissions.PRODUCTS)
+  @SetPermissions(UserPermissions.PRODUCTS_GET)
   findAll() {
     return this.productsService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.PRODUCTS)
+  @SetPermissions(UserPermissions.PRODUCTS_GET)
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.PRODUCTS)
+  @SetPermissions(UserPermissions.PRODUCTS_EDIT)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.PRODUCTS)
+  @SetPermissions(UserPermissions.PRODUCTS_DELETE)
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id);
   }

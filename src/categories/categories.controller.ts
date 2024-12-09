@@ -22,25 +22,25 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  @SetPermissions(UserPermissions.CATEGORIES)
+  @SetPermissions(UserPermissions.CATEGORIES_CREATE)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
 
   @Get()
-  @SetPermissions(UserPermissions.DEFAULT)
+  @SetPermissions(UserPermissions.CATEGORIES_GET)
   findAll() {
     return this.categoriesService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.DEFAULT)
+  @SetPermissions(UserPermissions.CATEGORIES_GET)
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.CATEGORIES)
+  @SetPermissions(UserPermissions.CATEGORIES_EDIT)
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -49,7 +49,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.CATEGORIES)
+  @SetPermissions(UserPermissions.CATEGORIES_DELETE)
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
   }

@@ -21,7 +21,7 @@ export class OrderLinesController {
   constructor(private readonly orderLinesService: OrderLinesService) {}
 
   @Post(':orderId/:productId')
-  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
+  @SetPermissions(UserPermissions.ORDERS_CREATE)
   create(
     @Param('orderId') orderId: number,
     @Param('productId') productId: number,
@@ -30,25 +30,25 @@ export class OrderLinesController {
   }
 
   @Get()
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_GET)
   findAll() {
     return this.orderLinesService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_GET)
   findOne(@Param('id') id: string) {
     return this.orderLinesService.findOne(+id);
   }
   @Get('order/:orderId')
-  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
+  @SetPermissions(UserPermissions.ORDERS_GET_OWN)
   findByOrderId(@Param('orderId') orderId: string, @Req() req: Request) {
     const user = req.user;
     return this.orderLinesService.findByOrderId(+orderId, +user.userId);
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.ORDERS, UserPermissions.DEFAULT)
+  @SetPermissions(UserPermissions.ORDERS_DELETE)
   remove(@Param('id') id: string) {
     console.log(id);
 

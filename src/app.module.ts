@@ -13,6 +13,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { ShippingMethodModule } from './shipping_method/shipping_method.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { VerificationModule } from './verification/verification.module';
+import { SeedingModule } from './seeding/seeding.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { VerificationModule } from './verification/verification.module';
     ShippingMethodModule,
     AddressesModule,
     VerificationModule,
+    SeedingModule,
   ],
 })
 export class AppModule {}

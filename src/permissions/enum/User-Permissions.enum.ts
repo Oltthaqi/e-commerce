@@ -1,10 +1,85 @@
 export enum UserPermissions {
-  DEFAULT = 'DEFAULT', // Normal users: manage personal orders, profile, etc.
-  ORDERS = 'ORDERS', // Manage all orders: view, update status, delete.
-  PRODUCTS = 'PRODUCTS', // Manage all products: create, update, delete.
-  CATEGORIES = 'CATEGORIES', // Manage categories: create, update, delete.
-  ROLES = 'ROLES', // Admin: manage roles.
-  PERMISSION = 'PERMISSION', // Admin: manage permissions.
-  USERS = 'USERS', // Admin: manage users.
-  SHIPPING = 'SHIPPING', //Manage shipping: view, update, delete.
+  ORDERS_GET = 'ORDERS_GET',
+  ORDERS_CREATE = 'ORDERS_CREATE',
+  ORDERS_GET_OWN = 'ORDERS_GET_OWN',
+  ORDERS_EDIT = 'ORDERS_EDIT',
+  ORDERS_DELETE = 'ORDERS_DELETE',
+  ORDERS_REFUND = 'ORDERS_REFUND',
+  ORDERS_RETURN = 'ORDERS_RETURN',
+
+  PRODUCTS_GET = 'PRODUCTS_GET',
+  PRODUCTS_CREATE = 'PRODUCTS_CREATE',
+  PRODUCTS_EDIT = 'PRODUCTS_EDIT',
+  PRODUCTS_DELETE = 'PRODUCTS_DELETE',
+
+  CATEGORIES_GET = 'CATEGORIES_GET',
+  CATEGORIES_CREATE = 'CATEGORIES_CREATE',
+  CATEGORIES_EDIT = 'CATEGORIES_EDIT',
+  CATEGORIES_DELETE = 'CATEGORIES_DELETE',
+
+  ROLES_GET = 'ROLES_GET',
+  ROLES_CREATE = 'ROLES_CREATE',
+  ROLES_EDIT = 'ROLES_EDIT',
+  ROLES_DELETE = 'ROLES_DELETE',
+  PERMISSION_GET = 'PERMISSION_GET',
+  PERMISSION_EDIT = 'PERMISSION_EDIT',
+  PERMISSION_CREATE = 'PERMISSION_CREATE',
+  PERMISSION_DELETE = 'PERMISSION_DELETE',
+
+  USERS_GET = 'USERS_GET',
+  USERS_CREATE = 'USERS_CREATE',
+  USERS_EDIT = 'USERS_EDIT',
+  USERS_DELETE = 'USERS_DELETE',
+  USERS_BAN = 'USERS_BAN',
+  USERS_UNBAN = 'USERS_UNBAN',
+  USERS_ROLES_MANAGE = 'USERS_ROLES_MANAGE',
+
+  SHIPPING_GET = 'SHIPPING_GET',
+  SHIPPING_CREATE = 'SHIPPING_CREATE',
+  SHIPPING_EDIT = 'SHIPPING_EDIT',
+  SHIPPING_DELETE = 'SHIPPING_DELETE',
+  SHIPPING_GET_OWN = 'SHIPPING_GET_OWN',
 }
+
+export const PermissionDescriptions: Record<UserPermissions, string> = {
+  [UserPermissions.ORDERS_GET]: 'View all orders.',
+  [UserPermissions.ORDERS_CREATE]: 'Create new orders.',
+  [UserPermissions.ORDERS_GET_OWN]: 'View own orders.',
+  [UserPermissions.ORDERS_EDIT]: 'Edit orders.',
+  [UserPermissions.ORDERS_DELETE]: 'Delete orders.',
+  [UserPermissions.ORDERS_REFUND]: 'Process order refunds.',
+  [UserPermissions.ORDERS_RETURN]: 'Handle order returns.',
+
+  [UserPermissions.PRODUCTS_GET]: 'View all products.',
+  [UserPermissions.PRODUCTS_CREATE]: 'Create new products.',
+  [UserPermissions.PRODUCTS_EDIT]: 'Edit existing products.',
+  [UserPermissions.PRODUCTS_DELETE]: 'Delete products.',
+
+  [UserPermissions.CATEGORIES_GET]: 'View all categories.',
+  [UserPermissions.CATEGORIES_CREATE]: 'Create new categories.',
+  [UserPermissions.CATEGORIES_EDIT]: 'Edit categories.',
+  [UserPermissions.CATEGORIES_DELETE]: 'Delete categories.',
+
+  [UserPermissions.ROLES_GET]: 'View all roles.',
+  [UserPermissions.ROLES_CREATE]: 'Create new roles.',
+  [UserPermissions.ROLES_EDIT]: 'Edit roles.',
+  [UserPermissions.ROLES_DELETE]: 'Delete roles.',
+  [UserPermissions.PERMISSION_GET]: 'View permissions.',
+  [UserPermissions.PERMISSION_EDIT]: 'Edit permissions.',
+  [UserPermissions.PERMISSION_CREATE]: 'Create new permissions.',
+  [UserPermissions.PERMISSION_DELETE]: 'Delete permissions.',
+
+  [UserPermissions.USERS_GET]: 'View all users.',
+  [UserPermissions.USERS_CREATE]: 'Create new users.',
+  [UserPermissions.USERS_EDIT]: 'Edit user details.',
+  [UserPermissions.USERS_DELETE]: 'Delete users.',
+  [UserPermissions.USERS_BAN]: 'Ban users.',
+  [UserPermissions.USERS_UNBAN]: 'Unban users.',
+  [UserPermissions.USERS_ROLES_MANAGE]: 'Manage roles for users.',
+
+  [UserPermissions.SHIPPING_GET]: 'View all shipping details.',
+  [UserPermissions.SHIPPING_CREATE]: 'Create new shipping entries.',
+  [UserPermissions.SHIPPING_EDIT]: 'Edit shipping details.',
+  [UserPermissions.SHIPPING_DELETE]: 'Delete shipping entries.',
+  [UserPermissions.SHIPPING_GET_OWN]: 'View own shipping details.',
+};

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RolesSeeder } from './seeding/RolesSeeder';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,13 @@ async function bootstrap() {
       'access-token',
     )
     .build();
+
+  const rolesSeeder = app.get(RolesSeeder);
+  if (process.env.RUN_SEED === 'true') {
+    console.log('shit');
+
+    await rolesSeeder.seed();
+  }
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);

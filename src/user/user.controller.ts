@@ -22,31 +22,31 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @SetPermissions(UserPermissions.USERS)
+  @SetPermissions(UserPermissions.USERS_CREATE)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  @SetPermissions(UserPermissions.USERS)
+  @SetPermissions(UserPermissions.USERS_GET)
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.USERS)
+  @SetPermissions(UserPermissions.USERS_GET)
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.USERS)
+  @SetPermissions(UserPermissions.USERS_EDIT)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.USERS)
+  @SetPermissions(UserPermissions.USERS_DELETE)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }

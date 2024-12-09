@@ -22,25 +22,25 @@ export class ShippingMethodController {
   constructor(private readonly shippingMethodService: ShippingMethodService) {}
 
   @Post()
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_CREATE)
   create(@Body() createShippingMethodDto: CreateShippingMethodDto) {
     return this.shippingMethodService.create(createShippingMethodDto);
   }
 
   @Get()
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET)
   findAll() {
     return this.shippingMethodService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET)
   findOne(@Param('id') id: string) {
     return this.shippingMethodService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_EDIT)
   update(
     @Param('id') id: string,
     @Body() updateShippingMethodDto: UpdateShippingMethodDto,
@@ -49,7 +49,7 @@ export class ShippingMethodController {
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_DELETE)
   remove(@Param('id') id: string) {
     return this.shippingMethodService.remove(+id);
   }

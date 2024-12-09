@@ -23,26 +23,26 @@ export class AddressesController {
   constructor(private readonly addressesService: AddressesService) {}
 
   @Post()
-  @SetPermissions(UserPermissions.DEFAULT, UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_CREATE)
   create(@Body() createAddressDto: CreateAddressDto, @Req() req: Request) {
     const user = req.user;
     return this.addressesService.create(createAddressDto, user.userId);
   }
 
   @Get()
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET)
   findAll() {
     return this.addressesService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET)
   findOne(@Param('id') id: string) {
     return this.addressesService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.DEFAULT, UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_EDIT)
   update(
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto,
@@ -53,27 +53,27 @@ export class AddressesController {
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_DELETE)
   remove(@Param('id') id: string) {
     return this.addressesService.remove(+id);
   }
 
   @Get('user')
-  @SetPermissions(UserPermissions.DEFAULT, UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET_OWN)
   findUserAddresses(@Req() req: Request) {
     const user = req.user;
     return this.addressesService.findUserAddresses(user.userId);
   }
 
   @Get('user/:addressId')
-  @SetPermissions(UserPermissions.DEFAULT, UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_GET)
   findUserAddress(@Param('addressId') addressId: string, @Req() req: Request) {
     const user = req.user;
     return this.addressesService.findUserAddress(user.userId, +addressId);
   }
 
   @Delete('user/:addressId')
-  @SetPermissions(UserPermissions.DEFAULT, UserPermissions.SHIPPING)
+  @SetPermissions(UserPermissions.SHIPPING_DELETE)
   removeUserAddress(
     @Param('addressId') addressId: string,
     @Req() req: Request,

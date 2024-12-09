@@ -24,7 +24,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post(':shippingMethodId')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_CREATE)
   create(
     @Req() req: Request,
     @Param('shippingMethodId') shippingMethodId: number,
@@ -34,25 +34,25 @@ export class OrdersController {
   }
 
   @Get()
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_GET)
   findAll() {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_GET)
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(+id);
   }
 
   @Patch(':id')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_EDIT)
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(+id, updateOrderDto);
   }
 
   @Delete(':id')
-  @SetPermissions(UserPermissions.ORDERS)
+  @SetPermissions(UserPermissions.ORDERS_DELETE)
   remove(@Param('id') id: string) {
     return this.ordersService.remove(+id);
   }

@@ -9,7 +9,7 @@ export class Permission {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @ManyToMany(() => Role, (role) => role.permissions)
