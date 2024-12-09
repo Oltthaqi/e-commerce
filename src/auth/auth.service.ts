@@ -80,8 +80,8 @@ export class AuthService {
       password: hashedPassword,
       roles,
     });
-
     await this.userRepository.save(newUser);
+    await this.userService.generateEmailVerification(newUser.id);
 
     return newUser;
   }

@@ -29,6 +29,12 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  emailVerifiedAt: Date;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
   @OneToMany(() => Address, (address) => address.user)
   addresses: Address[];
 

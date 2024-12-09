@@ -50,4 +50,11 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
+
+  @Post('verify/:otp')
+  async verifyEmail(@Param('otp') otp: string) {
+    const result = await this.userService.verifyEmail(otp);
+
+    return { status: result ? 'sucess' : 'failure', message: null };
+  }
 }

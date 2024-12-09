@@ -12,6 +12,7 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ShippingMethodModule } from './shipping_method/shipping_method.module';
 import { AddressesModule } from './addresses/addresses.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AddressesModule } from './addresses/addresses.module';
     PermissionsModule,
     ShippingMethodModule,
     AddressesModule,
+    VerificationModule,
   ],
 })
 export class AppModule {}
