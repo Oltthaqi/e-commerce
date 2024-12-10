@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
@@ -100,5 +104,77 @@ export class OrdersService {
     }
 
     return this.orderRepo.remove(order);
+  }
+
+  async getOwnOrders(userId: number) {
+    const orders = await this.orderRepo.find({
+      where: {
+        user: { id: userId },
+      },
+    });
+    if (!orders) {
+      throw new NotFoundException('Orders not found');
+    }
+    return orders;
+  }
+
+  async getOwnOrder(userId: number, orderId: number) {
+    const order = await this.orderRepo.findOne({
+      where: { user: { id: userId }, id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    return order;
+  }
+
+  async splitOrder(orderId: number, orderLineIds: number[]) {
+    const order = await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: ['orderLines'],
+    });
+    if (orderLineIds.length === 1) {
+      throw new UnauthorizedException(
+        'You cannot split an order into one order',
+      );
+    }
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    const orderLines = order.orderLines.filter((orderLine) =>
+      orderLineIds.includes(orderLine.id),
+    );
+    console.log(order);
+
+    const newOrder = await this.orderRepo.create({
+      user: { id: order.user.id },
+      shipping_method: { id: order.shipping_method.id },
+      userId: order.userId,
+      shippingMethodId: order.shippingMethodId,
+      created_At: new Date(),
+      updated_At: new Date(),
+      status: OrderStatus.PENDING,
+      total: orderLines.reduce((acc, orderLine) => {
+        return acc + orderLine.total * orderLine.quantity;
+      }, 0),
+      orderLines,
+    });
+    order.total = order.total - newOrder.total;
+    await this.orderRepo.save(order);
+
+    await this.emailService.sendEmail({
+      subject: 'e-commerce - Order split',
+      recipients: [
+        { name: order.user.username ?? '', address: order.user.username },
+      ],
+      html: `<p>Hi ${order.user.username ?? 'User'},</p>
+         <p>Your order has been split into two. This product is not available for the moment. The current status is: <br />
+         <span style="font-size:24px; font-weight:700;">${order.status}</span></p>
+         <p>Thank you for shopping with us!</p>
+         <p>Regards,<br />MyApp Team</p>`,
+    });
+
+    return this.orderRepo.save(newOrder);
   }
 }

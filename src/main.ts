@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { RolesSeeder } from './seeding/RolesSeeder';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Role } from './roles/entities/role.entity';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,11 +24,15 @@ async function bootstrap() {
 
   const rolesSeeder = app.get(RolesSeeder);
   if (process.env.RUN_SEED === 'true') {
-    console.log('shit');
+    const rolesRepository = app.get(getRepositoryToken(Role));
+    const existingRoles = await rolesRepository.find();
 
-    await rolesSeeder.seed();
+    if (existingRoles.length === 0) {
+      await rolesSeeder.seed();
+    } else {
+      console.log('Roles already exist in the database. Seeder will not run.');
+    }
   }
-
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
   await app.listen(process.env.PORT ?? 3000);
