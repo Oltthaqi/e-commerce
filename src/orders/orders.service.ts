@@ -134,7 +134,8 @@ export class OrdersService {
       where: { id: orderId },
       relations: ['orderLines'],
     });
-    if (orderLineIds.length === 1) {
+
+    if (order.orderLines.length === 1) {
       throw new UnauthorizedException(
         'You cannot split an order into one order',
       );
@@ -145,7 +146,6 @@ export class OrdersService {
     const orderLines = order.orderLines.filter((orderLine) =>
       orderLineIds.includes(orderLine.id),
     );
-    console.log(order);
 
     const newOrder = await this.orderRepo.create({
       user: { id: order.user.id },
@@ -169,10 +169,19 @@ export class OrdersService {
         { name: order.user.username ?? '', address: order.user.username },
       ],
       html: `<p>Hi ${order.user.username ?? 'User'},</p>
-         <p>Your order has been split into two. This product is not available for the moment. The current status is: <br />
-         <span style="font-size:24px; font-weight:700;">${order.status}</span></p>
-         <p>Thank you for shopping with us!</p>
-         <p>Regards,<br />MyApp Team</p>`,
+             <p>Your order has been split into two. The following product(s) is/are not available for the moment:</p>
+             <ul>
+               ${orderLines
+                 .map(
+                   (line) =>
+                     `<li>${line.product.name} (Quantity: ${line.quantity})</li>`,
+                 )
+                 .join('')}
+             </ul>
+             <p>The current status is: <br />
+             <span style="font-size:24px; font-weight:700;">${order.status}</span></p>
+             <p>Thank you for shopping with us!</p>
+             <p>Regards,<br />MyApp Team</p>`,
     });
 
     return this.orderRepo.save(newOrder);

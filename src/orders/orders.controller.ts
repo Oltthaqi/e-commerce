@@ -84,9 +84,6 @@ export class OrdersController {
     @Param('orderId') orderId: string,
     @Body() orderLineIds: number[],
   ) {
-    console.log(orderLineIds);
-    console.log(orderId);
-
     return this.ordersService.splitOrder(+orderId, orderLineIds);
   }
 }
