@@ -14,6 +14,8 @@ import { ShippingMethodModule } from './shipping_method/shipping_method.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { VerificationModule } from './verification/verification.module';
 import { SeedingModule } from './seeding/seeding.module';
+import { WebhookModule } from './webhook/webhook.module';
+import { CarrierModule } from './carrier/carrier.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { SeedingModule } from './seeding/seeding.module';
     AddressesModule,
     VerificationModule,
     SeedingModule,
+    WebhookModule,
+    CarrierModule,
   ],
 })
 export class AppModule {}

@@ -11,6 +11,7 @@ import { OrderStatus } from './enum/Order.status.enum';
 import { ShippingMethod } from 'src/shipping_method/entities/shipping_method.entity';
 import { User } from 'src/user/entities/user.entity';
 import { EmailService } from 'src/message/email.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class OrdersService {
@@ -32,6 +33,7 @@ export class OrdersService {
       shippingMethodId,
       created_At: new Date(),
       updated_At: new Date(),
+      code: uuidv4(),
       status: OrderStatus.PENDING,
       total: shippingMethod.flat_rate,
     });
@@ -135,7 +137,7 @@ export class OrdersService {
       relations: ['orderLines'],
     });
 
-    if (order.orderLines.length === 1) {
+    if (order.orderLines.length === 1 && order.orderLines[0].quantity === 1) {
       throw new UnauthorizedException(
         'You cannot split an order into one order',
       );
@@ -155,6 +157,7 @@ export class OrdersService {
       created_At: new Date(),
       updated_At: new Date(),
       status: OrderStatus.PENDING,
+      code: uuidv4(),
       total: orderLines.reduce((acc, orderLine) => {
         return acc + orderLine.total * orderLine.quantity;
       }, 0),

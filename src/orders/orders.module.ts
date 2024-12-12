@@ -16,6 +16,6 @@ import { MessageModule } from 'src/message/message.module';
   ],
   controllers: [OrdersController],
   providers: [OrdersService],
-  exports: [OrdersService],
+  exports: [OrdersService, TypeOrmModule],
 })
 export class OrdersModule {}

@@ -11,6 +11,7 @@ import { OrderStatus } from '../enum/Order.status.enum';
 import { User } from 'src/user/entities/user.entity';
 import { ShippingMethod } from 'src/shipping_method/entities/shipping_method.entity';
 import { OrderLine } from 'src/order-lines/entities/order-line.entity';
+import { Carrier } from 'src/carrier/entities/carrier.entity';
 
 @Entity()
 export class Order {
@@ -28,9 +29,15 @@ export class Order {
   @ManyToOne(
     () => ShippingMethod,
     (shipping_method) => shipping_method.orders,
-    { eager: true },
+    {
+      eager: true,
+    },
   )
   shipping_method: ShippingMethod;
+
+  carrierId: number;
+  @ManyToOne(() => Carrier, (carrier) => carrier.orders)
+  carrier: Carrier;
 
   @CreateDateColumn()
   created_At: Date;
@@ -52,4 +59,7 @@ export class Order {
     cascade: true,
   })
   orderLines: OrderLine[];
+
+  @Column()
+  code: string;
 }

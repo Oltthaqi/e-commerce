@@ -17,6 +17,11 @@ export class AuthController {
     return this.authService.login(loginDto.username, loginDto.password);
   }
 
+  @Post('carrier/login')
+  async carrierLogin(@Body() loginDto: LoginDto) {
+    return this.authService.carrierLogin(loginDto.username, loginDto.password);
+  }
+
   @ApiOperation({ summary: 'Register an user' })
   @ApiBody({ type: RegisterUsersDto })
   @Post('Register')

@@ -136,6 +136,7 @@ export class UserService {
       user.id,
       token,
     );
+    await this.verificationTokenService.cleanUpExpiredTokens();
 
     if (!isValid) {
       throw new UnprocessableEntityException(invalidMessage);
