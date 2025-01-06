@@ -16,6 +16,7 @@ import { VerificationModule } from './verification/verification.module';
 import { SeedingModule } from './seeding/seeding.module';
 import { WebhookModule } from './webhook/webhook.module';
 import { CarrierModule } from './carrier/carrier.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CarrierModule } from './carrier/carrier.module';
     SeedingModule,
     WebhookModule,
     CarrierModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
