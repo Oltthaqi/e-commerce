@@ -48,6 +48,35 @@ export class ChatGateway implements OnGatewayConnection {
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
+  @SubscribeMessage('createTicket')
+  async createTicket(
+    @MessageBody() createChatDto: CreateChatDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('Received Payload:', createChatDto);
+
+    const senderId = client.data.userId;
+
+    const chat = await this.chatService.createTicket(createChatDto, senderId);
+
+    const fullSender = await this.userRepo.findOne({
+      where: { id: senderId },
+      select: ['id', 'username'],
+    });
+
+    const message = {
+      ...chat,
+      sender: {
+        id: fullSender.id,
+        username: fullSender.username,
+      },
+    };
+
+    this.server.to(`room-${chat.roomId}`).emit('newMessage', message);
+    this.server.emit('createTicket', chat);
+
+    return await message;
+  }
   @SubscribeMessage('createChat')
   async create(
     @MessageBody() createChatDto: CreateChatDto,
@@ -71,8 +100,8 @@ export class ChatGateway implements OnGatewayConnection {
         username: fullSender.username,
       },
     };
-
-    this.server.to(`room-${chat.roomId}`).emit('newMessage', message);
+    console.log('Message:', message, chat.roomId);
+    this.server.to(`room-${message.roomId}`).emit('newMessage', message);
 
     return await message;
   }
@@ -124,11 +153,10 @@ export class ChatGateway implements OnGatewayConnection {
   async getAllOpenTicketsForAdmin(@ConnectedSocket() client: Socket) {
     const token = client.handshake.auth.token;
     const decoded = await this.jwtService.verify(token);
-    console.log('Decoded:', decoded);
 
     if (decoded.roles[0] === UserRoles.ADMIN) {
       try {
-        console.log('hiniiii', decoded.sub);
+        console.log('hiniiii1', decoded.sub);
 
         const tickets = await this.chatService.getAllOpenTicketsForAdmin(
           decoded.sub,
@@ -141,7 +169,7 @@ export class ChatGateway implements OnGatewayConnection {
       }
     } else {
       try {
-        console.log('hiniiii', decoded.sub);
+        console.log('hiniiii2', decoded.sub);
 
         const tickets = await this.chatService.getAllOpenTicketsForUser(
           decoded.sub,
@@ -188,5 +216,25 @@ export class ChatGateway implements OnGatewayConnection {
     const name = await this.chatService.getClientName(client.data.userId);
 
     client.broadcast.emit('typing', { name, isTyping });
+  }
+
+  @SubscribeMessage('closeChat')
+  async closeChat(
+    @MessageBody() roomId: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const token = client.handshake.auth.token;
+    const decoded = this.jwtService.verify(token);
+
+    if (decoded.roles[0] === UserRoles.ADMIN) {
+      try {
+        const result = await this.chatService.closeChat(roomId);
+        this.server.to(`room-${roomId}`).emit('chatClosed', roomId);
+        return result;
+      } catch (error) {
+        throw new WsException(error.message);
+      }
+    }
+    throw new WsException('Unauthorized');
   }
 }

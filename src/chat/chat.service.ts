@@ -8,6 +8,22 @@ import { ChatStatus } from './enums/ChatStatus.enum';
 export class ChatService {
   constructor(@InjectRepository(Chat) private chatRepo: Repository<Chat>) {}
 
+  async createTicket(createChatDto: CreateChatDto, senderId: number) {
+    const lastRoomId = await this.chatRepo
+      .createQueryBuilder('chat')
+      .orderBy('chat.roomId', 'DESC')
+      .getOne();
+
+    const chat = this.chatRepo.create({
+      message: createChatDto.message,
+      roomId: lastRoomId ? lastRoomId.roomId + 1 : 1,
+      sender: { id: senderId },
+      status: ChatStatus.OPEN,
+    });
+
+    return this.chatRepo.save(chat);
+  }
+
   async create(
     createChatDto: CreateChatDto,
     senderId: number,
@@ -98,7 +114,7 @@ export class ChatService {
       WITH DistinctRooms AS (
         SELECT roomId, MIN(id) AS minId
         FROM e_commerce.chats
-        WHERE status = 'OPEN' AND senderId = ${userId} OR receiverId = ${userId}
+        WHERE status = '${ChatStatus.OPEN}' AND (senderId = ${userId} OR receiverId = ${userId})
         GROUP BY roomId
       )
       SELECT c.roomId, c.created_At, c.senderId, c.status
@@ -137,5 +153,18 @@ export class ChatService {
   async getClientName(clientId: number) {
     const chat = await this.chatRepo.findOne({ where: { id: clientId } });
     return chat ? chat.sender : null;
+  }
+
+  async closeChat(roomId: number) {
+    const openChats = await this.chatRepo.find({
+      where: { roomId, status: ChatStatus.OPEN },
+    });
+
+    if (openChats.length === 0) {
+      throw new Error('Room not found or already closed.');
+    }
+
+    await this.chatRepo.update({ roomId }, { status: ChatStatus.CLOSE });
+    return { message: 'Chat closed successfully.' };
   }
 }
